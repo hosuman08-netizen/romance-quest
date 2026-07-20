@@ -1,22 +1,24 @@
-
 (function(){
   var credits=+(localStorage.getItem('romance-quest_cr')||10);
   var root=document.getElementById('app');
-  function save(){localStorage.setItem('romance-quest_cr',credits);}
+  var step=+(localStorage.getItem('rq_step')||0);
+  var lines=['카페 앞에서 마주친다.','비가 오기 시작한다.','상대가 우산을 내민다.','엘리베이터에 단둘이.','옥상에서 도시 불빛.'];
+  function save(){localStorage.setItem('romance-quest_cr',credits);localStorage.setItem('rq_step',step);}
   function render(){
-    root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional entertainment · 실관계/결제 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> (가상)<div class="row" style="margin-top:10px"><button id="use">1 사용 · 체험</button><button class="sec" id="get">무료 +3 (쿨다운 로컬)</button></div><div id="log" class="sub" style="margin-top:10px"></div></div>';
-    document.getElementById('use').onclick=function(){
-      if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 무료 충전 또는 후원 문의';return;}
-      credits--;save();document.getElementById('log').textContent='체험 로그: ' + new Date().toLocaleTimeString() + ' · 장면 해금(가상)';
-      render();try{legionTrack('activate',{credits:credits})}catch(e){}
-    };
-    document.getElementById('get').onclick=function(){
-      var k='romance-quest_cd_'+new Date().toDateString();
-      if(localStorage.getItem(k)){document.getElementById('log').textContent='오늘 무료 충전 완료';return;}
-      credits+=3;localStorage.setItem(k,'1');save();render();try{legionTrack('activate',{free:1})}catch(e){}
-    };
+    root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실관계 아님</div>'
+      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+lines.length
+      +'<p style="margin:12px 0;font-size:16px">'+(lines[step]||'끝')+'</p>'
+      +'<div class="row"><button id="a">다가간다 (-1)</button><button class="sec" id="b">기다린다 (-1)</button></div>'
+      +'<div id="log" class="sub" style="margin-top:10px"></div></div>';
+    function go(ch){
+      if(credits<=0){document.getElementById('log').textContent='크레딧 없음';return;}
+      credits--; step=Math.min(lines.length-1, step+1); save();
+      document.getElementById('log').textContent='선택: '+ch; render();
+      try{legionTrack('activate',{ch:ch,step:step})}catch(e){}
+    }
+    document.getElementById('a').onclick=function(){go('다가감');};
+    document.getElementById('b').onclick=function(){go('대기');};
   }
-  try{legionTrack('session_start',{app:'romance-quest'})}catch(e){}
+  try{legionTrack('session_start',{})}catch(e){}
   render();
 })();
