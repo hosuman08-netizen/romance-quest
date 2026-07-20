@@ -5,18 +5,35 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
   var credits=+(localStorage.getItem('romance-quest_cr')||10);
   var root=document.getElementById('app');
   var step=+(localStorage.getItem('rq_step')||0);
-  var lines=['카페 앞에서 마주친다.','비가 오기 시작한다.','상대가 우산을 내민다.','엘리베이터에 단둘이.','옥상에서 도시 불빛.'];
+  var lines=[
+    '카페 앞에서 마주친다.',
+    '비가 오기 시작한다.',
+    '상대가 우산을 내민다.',
+    '엘리베이터에 단둘이.',
+    '옥상에서 도시 불빛.',
+    '지하철 막차 직전.',
+    '편의점 앞에서 나란히.',
+    '문 앞에서 돌아본다.'
+  ];
   var SHARE_BASE='https://hosuman08-netizen.github.io/romance-quest/';
   function save(){localStorage.setItem('romance-quest_cr',credits);localStorage.setItem('rq_step',step);}
   function dayKey(off){var d=new Date();d.setDate(d.getDate()+(off||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function fomoLeft(){var e=new Date();e.setHours(24,0,0,0);var ms=Math.max(0,e-Date.now());return Math.floor(ms/3600000)+'h '+Math.floor((ms%3600000)/60000)+'m';}
   function kId(){try{var id=localStorage.getItem('rq_k_id');if(!id){id='r'+Math.random().toString(36).slice(2,8);localStorage.setItem('rq_k_id',id);}return id;}catch(e){return 'share';}}
   function shareUrl(){return SHARE_BASE+'?utm_source=share&utm_medium=app&ref='+encodeURIComponent(kId());}
   function pathLog(){try{return JSON.parse(localStorage.getItem('rq_path')||'[]');}catch(e){return[];}}
   function pushPath(ch){
     try{
       var p=pathLog(); p.push({s:step,ch:ch,t:Date.now()});
-      localStorage.setItem('rq_path',JSON.stringify(p.slice(-12)));
+      localStorage.setItem('rq_path',JSON.stringify(p.slice(-16)));
     }catch(e){}
+  }
+  function endingLabel(path){
+    var approach=path.filter(function(x){return x.ch==='다가감';}).length;
+    var wait=path.filter(function(x){return x.ch==='대기';}).length;
+    if(approach>=wait+2) return '엔딩 A · 적극 루트';
+    if(wait>=approach+2) return '엔딩 B · 여운 루트';
+    return '엔딩 C · 균형 루트';
   }
   function bumpStreak(){
     try{
@@ -40,11 +57,16 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     var ready=!st.shieldLast||((new Date(dayKey(0))-new Date(st.shieldLast))/86400000)>=7;
     var atEnd=step>=lines.length-1;
     var path=pathLog();
+    var endL=atEnd?endingLabel(path):'';
     var pathHtml=path.length?'<div class="sub" style="margin-top:8px">경로: '+path.map(function(x){return x.ch;}).join(' → ')+'</div>':'';
+    // if step was beyond new length from old save
+    if(step>lines.length-1){step=lines.length-1; save();}
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실관계 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+lines.length+' · '+Math.round((step+1)/lines.length*100)+'%'+' · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
+      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+lines.length+' · '+Math.round((step+1)/lines.length*100)+'% · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
+      +' · 창 '+fomoLeft()
       +'<div class="bar" style="height:6px;background:#2a2438;border-radius:4px;margin:8px 0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round((step+1)/lines.length*100)+'%;background:#f472b6"></i></div>'
       +'<p style="margin:12px 0;font-size:16px">'+(lines[step]||'끝')+'</p>'
+      +(atEnd?'<p style="color:#e0b552;font-weight:700;margin:0 0 8px">'+endL+'</p>':'')
       +'<div class="row"><button id="a">다가간다 (-1)</button><button class="sec" id="b">기다린다 (-1)</button></div>'
       +'<div class="row" style="margin-top:8px"><button class="sec" id="undo" '+(step<=0?'disabled':'')+'>↩ 한 장면 되돌리기</button>'
       +'<button class="sec" id="restart">처음부터</button><button class="sec" id="free">무료 +2 (일1)</button></div>'
@@ -58,6 +80,7 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       +'<a style="color:#e0b552;margin:0 6px" href="https://hosuman08-netizen.github.io/legion-hub/?utm_source=romance&utm_medium=pipe">🎮 Arcade</a></div></div>';
     function go(ch){
       if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 후원 문의';try{legionTrack('money_pipe_shown',{app:'romance',empty:1})}catch(e){}return;}
+      if(atEnd){document.getElementById('log').textContent='엔딩 완료 · 처음부터 또는 공유';return;}
       credits--; step=Math.min(lines.length-1, step+1); pushPath(ch); save(); bumpStreak();
       render();
       document.getElementById('log').textContent='선택: '+ch;
@@ -84,16 +107,13 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     };
     var sb=document.getElementById('shareBtn');
     if(sb) sb.onclick=function(){
-      var text='Romance Quest ending (fictional 18+) · path '+path.map(function(x){return x.ch;}).join('/')+'\n'+shareUrl();
+      var text='Romance Quest '+endL+' (fictional 18+) · path '+path.map(function(x){return x.ch;}).join('/')+'\n'+shareUrl();
       if(navigator.share)navigator.share({text:text,url:shareUrl()}).catch(function(){});
       else if(navigator.clipboard)navigator.clipboard.writeText(text);
-      try{legionTrack('share_peak',{})}catch(e){}
+      try{legionTrack('share_peak',{end:endL})}catch(e){}
     };
   }
   try{var q=new URLSearchParams(location.search||'');var ref=q.get('ref');if(ref&&ref!=='share'&&ref!==kId()&&!localStorage.getItem('rq_k_from')){localStorage.setItem('rq_k_from',ref);try{legionTrack('k_link',{from:ref})}catch(e){}}}catch(e){}
   try{legionTrack('session_start',{})}catch(e){}
   render();
-
-/* LEGION_WAVE_77_fomo_chip */
-setTimeout(function(){try{if(document.getElementById('lw_fomo_77'))return;var end=new Date(); end.setHours(24,0,0,0);var ms=Math.max(0,end-Date.now());var h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000);var d=document.createElement('div'); d.id='lw_fomo_77';d.style.cssText='font-size:11px;opacity:.75;margin:6px 0;color:#e0b552';d.textContent='window '+h+'h '+m+'m · W77';var app=document.getElementById('app')||document.body; app.insertBefore(d, app.firstChild);}catch(e){}},40);
 })();
