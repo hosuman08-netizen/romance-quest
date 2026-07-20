@@ -13,7 +13,7 @@
     function go(ch){
       if(credits<=0){document.getElementById('log').textContent='크레딧 없음';return;}
       credits--; step=Math.min(lines.length-1, step+1); save();
-      document.getElementById('log').textContent='선택: '+ch; render();
+      document.getElementById('log').textContent='선택: '+ch; if(step>=lines.length-1){try{legionTrack('share_peak_shown',{end:1})}catch(e){}} render();
       try{legionTrack('activate',{ch:ch,step:step})}catch(e){}
     }
     document.getElementById('a').onclick=function(){go('다가감');};
