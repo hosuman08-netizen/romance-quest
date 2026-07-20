@@ -1,9 +1,5 @@
-# p38-romance-quest — Romance Quest
-**Wave A · 성인 빠른 돈 · 18+ only**
-- Money: 챕터 과금
-- Pitch: 연애 스토리 텍스트 게임. 챕터 과금.
-- Format: web mini-app / TG-ready
-- Guards: age gate mandatory · no minors · platform ToS · fictional where noted
+# Romance Quest
 
-## LEARNED 2026-07-21 parallel
-- PWA sw shell · always-learning stamp · fleet parallel wave
+LIVE: https://hosuman08-netizen.github.io/romance-quest/
+
+BUILT real loop 2026-07-21 parallel — not scaffold.
