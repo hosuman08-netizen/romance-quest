@@ -30,7 +30,7 @@
     var ready=!st.shieldLast||((new Date(dayKey(0))-new Date(st.shieldLast))/86400000)>=7;
     var atEnd=step>=lines.length-1;
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실관계 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+lines.length+' · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
+      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+lines.length+' · '+Math.round((step+1)/lines.length*100)+'%'+' · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
       +'<p style="margin:12px 0;font-size:16px">'+(lines[step]||'끝')+'</p>'
       +'<div class="row"><button id="a">다가간다 (-1)</button><button class="sec" id="b">기다린다 (-1)</button></div>'
       +'<div id="log" class="sub" style="margin-top:10px"></div>'
