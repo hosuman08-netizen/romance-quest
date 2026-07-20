@@ -1,3 +1,6 @@
+
+/* LEGION_WAVE_32_today_counter */
+try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw_p38_romance__today_counter')||'{}');if(_o.d!==_dk)_o={d:_dk,n:0};_o.n=(_o.n||0)+1;localStorage.setItem('lw_p38_romance__today_counter',JSON.stringify(_o));}catch(e){}
 (function(){
   var credits=+(localStorage.getItem('romance-quest_cr')||10);
   var root=document.getElementById('app');
