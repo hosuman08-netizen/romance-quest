@@ -74,6 +74,31 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     if(wait>=approach+2) return '엔딩 B · 여운 루트';
     return '엔딩 C · 균형 루트';
   }
+  /* GOLD50 TOP4: LADS CG — 엔딩 A/B/C 색카드 + 경로 화살표. 엔진/LLM 0 */
+  function endingMeta(path){
+    var label=endingLabel(path);
+    if(label.indexOf('엔딩 A')===0) return {k:'A',t:'적극 루트',c:'#f472b6',bg:'#2a121c'};
+    if(label.indexOf('엔딩 B')===0) return {k:'B',t:'여운 루트',c:'#c4b5fd',bg:'#1a1428'};
+    return {k:'C',t:'균형 루트',c:'#67e8f9',bg:'#102428'};
+  }
+  function pathArrowHtml(path){
+    if(!path.length) return '';
+    return '<div style="margin:8px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:4px;justify-content:center">'
+      +path.map(function(x,i){
+        var on=x.ch==='다가감';
+        return (i?'<span style="opacity:.4;font-size:12px">→</span>':'')
+          +'<span class="chip" style="border:1px solid '+(on?'#f472b6':'#67e8f9')+';color:'+(on?'#f472b6':'#67e8f9')+'">'+x.ch+'</span>';
+      }).join('')+'</div>';
+  }
+  function endCardHtml(path){
+    var m=endingMeta(path);
+    return '<div id="endCard" style="margin:10px 0 8px;padding:18px 14px;border:1px solid '+m.c+'66;border-radius:16px;background:linear-gradient(180deg,'+m.c+'22,'+m.bg+');text-align:center">'
+      +'<div class="sub" style="margin:0 0 4px;letter-spacing:.14em">ENDING CARD</div>'
+      +'<div style="font-size:52px;font-weight:800;line-height:1;color:'+m.c+'">'+m.k+'</div>'
+      +'<div style="margin:8px 0 0;font-weight:700;color:'+m.c+'">엔딩 '+m.k+' · '+m.t+'</div>'
+      +'<div class="sub" style="margin:6px 0 0">픽션 · 실관계 아님 · LLM 0</div>'
+      +pathArrowHtml(path)+'</div>';
+  }
   function bumpStreak(){
     try{
       var st=JSON.parse(localStorage.getItem('rq_streak')||'{}');
@@ -97,7 +122,7 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     var atEnd=step>=SCENE_N-1;
     var path=pathLog();
     var endL=atEnd?endingLabel(path):'';
-    var pathHtml=path.length?'<div class="sub" style="margin-top:8px">경로: '+path.map(function(x){return x.ch;}).join(' → ')+'</div>':'';
+    var pathHtml=atEnd?'':pathArrowHtml(path);
     if(step>SCENE_N-1){step=SCENE_N-1; save();}
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실관계 아님</div>'
       +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+SCENE_N+' · '+Math.round((step+1)/SCENE_N*100)+'% · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
@@ -108,7 +133,7 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       +'<div id="msgCard" style="margin:0 0 12px;padding:10px 12px;border-radius:12px 12px 12px 4px;background:#241821;border:1px solid #f472b644">'
       +'<div class="sub" style="margin:0 0 4px">💬 '+LI.name+' · 메시지 · 고정 1줄 · LLM 0</div>'
       +'<p style="margin:0;font-size:15px">'+currentMsg()+'</p></div>'
-      +(atEnd?'<p style="color:#e0b552;font-weight:700;margin:0 0 8px">'+endL+'</p>':'')
+      +(atEnd?endCardHtml(path):'')
       +'<div class="row"><button id="a">다가간다 (-1)</button><button class="sec" id="b">기다린다 (-1)</button></div>'
       +'<div class="row" style="margin-top:8px"><button class="sec" id="undo" '+(step<=0?'disabled':'')+'>↩ 한 장면 되돌리기</button>'
       +'<button class="sec" id="restart">처음부터</button><button class="sec" id="free">무료 +2 (일1)</button></div>'
