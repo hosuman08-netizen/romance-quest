@@ -5,16 +5,41 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
   var credits=+(localStorage.getItem('romance-quest_cr')||10);
   var root=document.getElementById('app');
   var step=+(localStorage.getItem('rq_step')||0);
-  var lines=[
-    '카페 앞에서 마주친다.',
-    '비가 오기 시작한다.',
-    '상대가 우산을 내민다.',
-    '엘리베이터에 단둘이.',
-    '옥상에서 도시 불빛.',
-    '지하철 막차 직전.',
-    '편의점 앞에서 나란히.',
-    '문 앞에서 돌아본다.'
-  ];
+  /* GOLD50 TOP1: LADS/Ikemen — named LI. Fictional 1. 실인물 0 */
+  var LI={name:'세하', line:'말수는 적고, 우산을 먼저 내민다.'};
+  var SCENE_N=8;
+  var SHARED='카페 앞에서 '+LI.name+'와 마주친다.';
+  /* GOLD50 TOP2: Romance Club — 다가감/대기 각 8줄=16. 엔진 없이 배열. 실인물 0 */
+  var BRANCH={
+    '다가감':[
+      '먼저 손을 흔든다. '+LI.name+'가 짧게 고개만 끄덕인다.',
+      '처마를 벗어나 우산 쪽으로 붙는다. 빗소리가 가까워진다.',
+      '우산 손잡이를 같이 잡는다. '+LI.name+'의 손가락이 잠깐 멈춘다.',
+      '"몇 층이요?" '+LI.name+'가 숫자를 말하고, 네가 버튼을 누른다.',
+      '"오늘 빛 예쁘다." '+LI.name+'가 잠깐 웃고 다시 정면을 본다.',
+      '막차 문을 손으로 잡아 둔다. '+LI.name+'가 먼저 탄다.',
+      '따뜻한 캔을 건넨다. '+LI.name+'가 "…고마워" 하고 받는다.',
+      '문이 열리기 전, '+LI.name+'가 네 쪽을 한 번 더 본다.'
+    ],
+    '대기':[
+      '먼저 말하지 않는다. '+LI.name+'가 지나칠 듯 멈춘다.',
+      '처마 밑에서 비를 본다. '+LI.name+'가 우산을 살짝 기울인다.',
+      '우산을 받을지 한 박자 늦춘다. '+LI.name+'가 기다린다.',
+      '엘리베이터 거울만 본다. '+LI.name+'가 버튼을 누른다.',
+      '난간에 손을 올린다. '+LI.name+'가 같은 방향으로 선다.',
+      '문이 닫히기 직전, '+LI.name+'가 네 쪽 빈자리를 비워 둔다.',
+      '영수증을 접는다. '+LI.name+'가 아무것도 묻지 않는다.',
+      '문 앞에서 '+LI.name+'가 돌아본다. 그 시선을 끝까지 받는다.'
+    ]
+  };
+  function currentLine(){
+    var path=pathLog();
+    if(step<=0) return SHARED;
+    var prev=path[Math.min(step-1, Math.max(0,path.length-1))];
+    var ch=(prev && prev.ch) || '다가감';
+    var set=BRANCH[ch]||BRANCH['다가감'];
+    return set[Math.min(step, set.length-1)]||SHARED;
+  }
   var SHARE_BASE='https://hosuman08-netizen.github.io/romance-quest/';
   function save(){localStorage.setItem('romance-quest_cr',credits);localStorage.setItem('rq_step',step);}
   function dayKey(off){var d=new Date();d.setDate(d.getDate()+(off||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -55,17 +80,17 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     var st=JSON.parse(localStorage.getItem('rq_streak')||'{}');
     var sc=st.count||0;
     var ready=!st.shieldLast||((new Date(dayKey(0))-new Date(st.shieldLast))/86400000)>=7;
-    var atEnd=step>=lines.length-1;
+    var atEnd=step>=SCENE_N-1;
     var path=pathLog();
     var endL=atEnd?endingLabel(path):'';
     var pathHtml=path.length?'<div class="sub" style="margin-top:8px">경로: '+path.map(function(x){return x.ch;}).join(' → ')+'</div>':'';
-    // if step was beyond new length from old save
-    if(step>lines.length-1){step=lines.length-1; save();}
+    if(step>SCENE_N-1){step=SCENE_N-1; save();}
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실관계 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+lines.length+' · '+Math.round((step+1)/lines.length*100)+'% · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
+      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+SCENE_N+' · '+Math.round((step+1)/SCENE_N*100)+'% · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
       +' · 창 '+fomoLeft()
-      +'<div class="bar" style="height:6px;background:#2a2438;border-radius:4px;margin:8px 0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round((step+1)/lines.length*100)+'%;background:#f472b6"></i></div>'
-      +'<p style="margin:12px 0;font-size:16px">'+(lines[step]||'끝')+'</p>'
+      +'<div class="bar" style="height:6px;background:#2a2438;border-radius:4px;margin:8px 0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round((step+1)/SCENE_N*100)+'%;background:#f472b6"></i></div>'
+      +'<div style="margin:8px 0 4px"><b style="color:#f472b6">'+LI.name+'</b> · <span class="sub">'+LI.line+' · 픽션 1명 · 실인물 0</span></div>'
+      +'<p style="margin:12px 0;font-size:16px">'+currentLine()+'</p>'
       +(atEnd?'<p style="color:#e0b552;font-weight:700;margin:0 0 8px">'+endL+'</p>':'')
       +'<div class="row"><button id="a">다가간다 (-1)</button><button class="sec" id="b">기다린다 (-1)</button></div>'
       +'<div class="row" style="margin-top:8px"><button class="sec" id="undo" '+(step<=0?'disabled':'')+'>↩ 한 장면 되돌리기</button>'
@@ -81,10 +106,10 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     function go(ch){
       if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 후원 문의';try{legionTrack('money_pipe_shown',{app:'romance',empty:1})}catch(e){}return;}
       if(atEnd){document.getElementById('log').textContent='엔딩 완료 · 처음부터 또는 공유';return;}
-      credits--; step=Math.min(lines.length-1, step+1); pushPath(ch); save(); bumpStreak();
+      credits--; step=Math.min(SCENE_N-1, step+1); pushPath(ch); save(); bumpStreak();
       render();
       document.getElementById('log').textContent='선택: '+ch;
-      if(step>=lines.length-1){try{legionTrack('share_peak_shown',{end:1})}catch(e){} try{legionTrack('money_pipe_shown',{app:'romance'})}catch(e){}}
+      if(step>=SCENE_N-1){try{legionTrack('share_peak_shown',{end:1})}catch(e){} try{legionTrack('money_pipe_shown',{app:'romance'})}catch(e){}}
       try{legionTrack('activate',{ch:ch,step:step})}catch(e){}
     }
     document.getElementById('a').onclick=function(){go('다가감');};
@@ -107,7 +132,7 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     };
     var sb=document.getElementById('shareBtn');
     if(sb) sb.onclick=function(){
-      var text='Romance Quest '+endL+' (fictional 18+) · path '+path.map(function(x){return x.ch;}).join('/')+'\n'+shareUrl();
+      var text='Romance Quest '+LI.name+' · '+endL+' (fictional 18+) · path '+path.map(function(x){return x.ch;}).join('/')+'\n'+shareUrl();
       if(navigator.share)navigator.share({text:text,url:shareUrl()}).catch(function(){});
       else if(navigator.clipboard)navigator.clipboard.writeText(text);
       try{legionTrack('share_peak',{end:endL})}catch(e){}
