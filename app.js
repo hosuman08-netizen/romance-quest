@@ -34,11 +34,13 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
   };
   function currentLine(){
     var path=pathLog();
-    if(step<=0) return SHARED;
+    var br=loopN()===2?BRANCH2:BRANCH;
+    var sh=loopN()===2?SHARED2:SHARED;
+    if(step<=0) return sh;
     var prev=path[Math.min(step-1, Math.max(0,path.length-1))];
     var ch=(prev && prev.ch) || '다가감';
-    var set=BRANCH[ch]||BRANCH['다가감'];
-    return set[Math.min(step, set.length-1)]||SHARED;
+    var set=br[ch]||br['다가감'];
+    return set[Math.min(step, set.length-1)]||sh;
   }
   /* GOLD50 TOP3: Mystic/LADS 리추얼 — 장면마다 메시지 1줄. 고정카피. LLM 0 */
   var MSG=[
@@ -51,8 +53,45 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     '따뜻해. 잘 마셨어.',
     '내일도… 여기.'
   ];
+  /* GOLD50 TOP5: Love365 분량갭 — 루프2 비 오는 밤 8장면만. 장편 CMS 0. LLM 0 */
+  var SHARED2='빗소리가 먼저 들린다. '+LI.name+'가 처마 밑에 서 있다.';
+  var BRANCH2={
+    '다가감':[
+      '빗줄기가 굵어진다. '+LI.name+'가 우산을 네 쪽으로 밀어 준다.',
+      '횡단보도에서 잠깐 멈춘다. '+LI.name+'의 구두가 물에 잠긴다.',
+      '편의점 처마 밑. '+LI.name+'가 수건 하나를 꺼낸다.',
+      '버스 정류장. '+LI.name+'가 시간표를 보고 네 쪽을 본다.',
+      '골목 가로등. '+LI.name+'가 "이 길이 더 짧아" 하고 앞장선다.',
+      '자판기 앞에서 온음료를 고른다. '+LI.name+'가 네 잔을 먼저 집는다.',
+      '건물 앞에서 우산을 턴다. '+LI.name+'가 네 어깨를 본다.',
+      '문이 열리기 전, 빗소리가 잠깐 멈춘 것처럼 들린다.'
+    ],
+    '대기':[
+      '우산을 받지 않는다. '+LI.name+'가 한 발 옆에 선다.',
+      '횡단보도 버튼을 누르지 않는다. '+LI.name+'가 같이 기다린다.',
+      '편의점 문을 열지 않는다. '+LI.name+'가 먼저 들어간다.',
+      '버스가 온다. '+LI.name+'가 타지 않고 네 쪽을 본다.',
+      '골목에서 한 박자 늦춘다. '+LI.name+'가 속도를 맞춘다.',
+      '자판기 버튼을 고르지 않는다. '+LI.name+'가 같은 음료를 뽑는다.',
+      '우산을 흔들지 않는다. '+LI.name+'가 대신 턴다.',
+      '문 손잡이를 잡지 않는다. '+LI.name+'가 뒤를 돌아본다.'
+    ]
+  };
+  var MSG2=[
+    '비 더 세졌어. 우산 이쪽.',
+    '신발 젖었어. 괜찮아.',
+    '수건. 받아.',
+    '다음 버스… 같이 기다릴래.',
+    '이 골목이 더 나아.',
+    '따뜻하게. 네 거.',
+    '어깨… 젖었다.',
+    '빗소리, 잠깐 멈춘 것 같아.'
+  ];
+  function loopN(){var n=+(localStorage.getItem('rq_loop')||1); return n===2?2:1;}
+  function setLoop(n){try{localStorage.setItem('rq_loop',String(n===2?2:1));}catch(e){}}
   function currentMsg(){
-    return MSG[Math.min(Math.max(0,step), MSG.length-1)]||MSG[0];
+    var m=loopN()===2?MSG2:MSG;
+    return m[Math.min(Math.max(0,step), m.length-1)]||m[0];
   }
   var SHARE_BASE='https://hosuman08-netizen.github.io/romance-quest/';
   function save(){localStorage.setItem('romance-quest_cr',credits);localStorage.setItem('rq_step',step);}
@@ -126,7 +165,7 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     if(step>SCENE_N-1){step=SCENE_N-1; save();}
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실관계 아님</div>'
       +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+SCENE_N+' · '+Math.round((step+1)/SCENE_N*100)+'% · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
-      +' · 창 '+fomoLeft()
+      +' · 창 '+fomoLeft()+' · <span class="chip">'+(loopN()===2?'루프2 · 비 오는 밤':'루프1 · 낮')+'</span>'
       +'<div class="bar" style="height:6px;background:#2a2438;border-radius:4px;margin:8px 0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round((step+1)/SCENE_N*100)+'%;background:#f472b6"></i></div>'
       +'<div style="margin:8px 0 4px"><b style="color:#f472b6">'+LI.name+'</b> · <span class="sub">'+LI.line+' · 픽션 1명 · 실인물 0</span></div>'
       +'<p style="margin:12px 0;font-size:16px">'+currentLine()+'</p>'
@@ -139,7 +178,9 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       +'<button class="sec" id="restart">처음부터</button><button class="sec" id="free">무료 +2 (일1)</button></div>'
       +pathHtml
       +'<div id="log" class="sub" style="margin-top:10px"></div>'
-      +(atEnd?'<div id="sharePeak" style="margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px"><p style="margin:0 0 6px;font-size:13px">✨ 엔딩 직후 — 공유</p><button class="sec" id="shareBtn">📤 스토리 공유</button></div>':'')
+      +(atEnd?'<div id="sharePeak" style="margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px"><p style="margin:0 0 6px;font-size:13px">✨ 엔딩 직후 — 공유</p><button class="sec" id="shareBtn">📤 스토리 공유</button>'
+        +(loopN()===1?'<button class="sec" id="loop2" style="margin-top:8px;width:100%">루프2 · 비 오는 밤</button>':'<p class="sub" style="margin:8px 0 0">루프2 끝 · 장편 CMS 없음 · 처음부터=루프1</p>')
+        +'</div>':'')
       +'<div id="moneyPipe" style="margin-top:12px;padding:10px;border:1px solid #c5a46e44;border-radius:12px;background:#16121c;text-align:center;font-size:12px">'
       +'<div style="color:#e0b552;font-weight:700;margin-bottom:4px">💎 크레딧 · 후원 (18+ 엔터)</div>'
       +'<a style="color:#ece8f1;margin:0 6px" href="mailto:hoyashi95@gmail.com?subject=%5BRomance%5D%20support">☕ 후원</a>'
@@ -164,8 +205,13 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     };
     document.getElementById('restart').onclick=function(){
       if(!confirm('처음부터? 크레딧은 유지'))return;
-      step=0; try{localStorage.setItem('rq_path','[]');}catch(e){}
+      step=0; setLoop(1); try{localStorage.setItem('rq_path','[]');}catch(e){}
       save(); render(); try{legionTrack('restart',{})}catch(e){}
+    };
+    var l2=document.getElementById('loop2');
+    if(l2) l2.onclick=function(){
+      step=0; setLoop(2); try{localStorage.setItem('rq_path','[]');}catch(e){}
+      save(); render(); try{legionTrack('activate',{loop:2})}catch(e){}
     };
     document.getElementById('free').onclick=function(){
       var k='rq_free_'+dayKey(0);
