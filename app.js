@@ -179,7 +179,7 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       +pathHtml
       +'<div id="log" class="sub" style="margin-top:10px"></div>'
       +(atEnd?'<div id="sharePeak" style="margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px"><p style="margin:0 0 6px;font-size:13px">✨ 엔딩 직후 — 공유</p><button class="sec" id="shareBtn">📤 스토리 공유</button>'
-        +(loopN()===1?'<button class="sec" id="loop2" style="margin-top:8px;width:100%">루프2 · 비 오는 밤</button>':'<p class="sub" id="loop2End" style="margin:8px 0 0">루프2 끝 · 장편 CMS 없음 · LLM 0 · 처음부터=루프1</p>')
+        +(loopN()===1?'<button class="sec" id="loop2" style="margin-top:8px;width:100%">루프2 · 비 오는 밤</button>':'<p class="sub" id="loop2End" role="button" tabindex="0" title="탭=처음부터 · 루프1 · CMS/LLM 0" style="margin:8px 0 0;cursor:pointer;text-decoration:underline">루프2 끝 · 장편 CMS 없음 · LLM 0 · 탭=처음부터</p>')
         +'</div>':'')
       +'<div id="moneyPipe" style="margin-top:12px;padding:10px;border:1px solid #c5a46e44;border-radius:12px;background:#16121c;text-align:center;font-size:12px">'
       +'<div style="color:#e0b552;font-weight:700;margin-bottom:4px">💎 크레딧 · 후원 (18+ 엔터)</div>'
@@ -203,11 +203,19 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       try{var p=pathLog(); p.pop(); localStorage.setItem('rq_path',JSON.stringify(p));}catch(e){}
       save(); render(); try{legionTrack('undo',{})}catch(e){}
     };
+    function doRestartLoop1(){
+      step=0; setLoop(1); try{localStorage.setItem('rq_path','[]');}catch(e){}
+      save(); render();
+    }
     document.getElementById('restart').onclick=function(){
       if(!confirm('처음부터? 크레딧은 유지'))return;
-      step=0; setLoop(1); try{localStorage.setItem('rq_path','[]');}catch(e){}
-      save(); render(); try{legionTrack('restart',{})}catch(e){}
+      doRestartLoop1(); try{legionTrack('restart',{})}catch(e){}
     };
+    var l2e=document.getElementById('loop2End');
+    if(l2e){
+      l2e.onclick=function(){ doRestartLoop1(); try{legionTrack('restart',{from:'loop2End'})}catch(e){}; };
+      l2e.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); l2e.click(); } };
+    }
     var l2=document.getElementById('loop2');
     if(l2) l2.onclick=function(){
       step=0; setLoop(2); try{localStorage.setItem('rq_path','[]');}catch(e){}
