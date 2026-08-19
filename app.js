@@ -40,6 +40,20 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     var set=BRANCH[ch]||BRANCH['다가감'];
     return set[Math.min(step, set.length-1)]||SHARED;
   }
+  /* GOLD50 TOP3: Mystic/LADS 리추얼 — 장면마다 메시지 1줄. 고정카피. LLM 0 */
+  var MSG=[
+    '…여기야. 비 오는데.',
+    '우산 있는데. 같이 가도 돼.',
+    '손 시려. 잠깐만.',
+    '몇 층… 됐어. 네가 눌러.',
+    '오늘 빛, 이상하게 맑다.',
+    '문 잡아줘서. 다음엔 내가.',
+    '따뜻해. 잘 마셨어.',
+    '내일도… 여기.'
+  ];
+  function currentMsg(){
+    return MSG[Math.min(Math.max(0,step), MSG.length-1)]||MSG[0];
+  }
   var SHARE_BASE='https://hosuman08-netizen.github.io/romance-quest/';
   function save(){localStorage.setItem('romance-quest_cr',credits);localStorage.setItem('rq_step',step);}
   function dayKey(off){var d=new Date();d.setDate(d.getDate()+(off||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -91,6 +105,9 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       +'<div class="bar" style="height:6px;background:#2a2438;border-radius:4px;margin:8px 0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round((step+1)/SCENE_N*100)+'%;background:#f472b6"></i></div>'
       +'<div style="margin:8px 0 4px"><b style="color:#f472b6">'+LI.name+'</b> · <span class="sub">'+LI.line+' · 픽션 1명 · 실인물 0</span></div>'
       +'<p style="margin:12px 0;font-size:16px">'+currentLine()+'</p>'
+      +'<div id="msgCard" style="margin:0 0 12px;padding:10px 12px;border-radius:12px 12px 12px 4px;background:#241821;border:1px solid #f472b644">'
+      +'<div class="sub" style="margin:0 0 4px">💬 '+LI.name+' · 메시지 · 고정 1줄 · LLM 0</div>'
+      +'<p style="margin:0;font-size:15px">'+currentMsg()+'</p></div>'
       +(atEnd?'<p style="color:#e0b552;font-weight:700;margin:0 0 8px">'+endL+'</p>':'')
       +'<div class="row"><button id="a">다가간다 (-1)</button><button class="sec" id="b">기다린다 (-1)</button></div>'
       +'<div class="row" style="margin-top:8px"><button class="sec" id="undo" '+(step<=0?'disabled':'')+'>↩ 한 장면 되돌리기</button>'
