@@ -132,10 +132,9 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
   function endCardHtml(path){
     var m=endingMeta(path);
     return '<div id="endCard" style="margin:10px 0 8px;padding:18px 14px;border:1px solid '+m.c+'66;border-radius:16px;background:linear-gradient(180deg,'+m.c+'22,'+m.bg+');text-align:center">'
-      +'<div class="sub" style="margin:0 0 4px;letter-spacing:.14em">ENDING CARD</div>'
       +'<div style="font-size:52px;font-weight:800;line-height:1;color:'+m.c+'">'+m.k+'</div>'
-      +'<div style="margin:8px 0 0;font-weight:700;color:'+m.c+'">엔딩 '+m.k+' · '+m.t+'</div>'
-      +'<div class="sub" style="margin:6px 0 0">픽션 · 실관계 아님 · LLM 0</div>'
+      +'<div style="margin:8px 0 0;font-weight:700;color:'+m.c+'">'+m.t+'</div>'
+      +'<div class="sub" style="margin:6px 0 0">픽션 · 실관계 아님</div>'
       +pathArrowHtml(path)+'</div>';
   }
   function bumpStreak(){
