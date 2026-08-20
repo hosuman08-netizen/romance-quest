@@ -163,23 +163,22 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     var endL=atEnd?endingLabel(path):'';
     var pathHtml=atEnd?'':pathArrowHtml(path);
     if(step>SCENE_N-1){step=SCENE_N-1; save();}
-    root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional · 실관계 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 장면 '+(step+1)+'/'+SCENE_N+' · '+Math.round((step+1)/SCENE_N*100)+'% · 🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')
-      +' · 창 '+fomoLeft()+' · <span class="chip">'+(loopN()===2?'루프2 · 비 오는 밤':'루프1 · 낮')+'</span>'
-      +'<div class="bar" style="height:6px;background:#2a2438;border-radius:4px;margin:8px 0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round((step+1)/SCENE_N*100)+'%;background:#f472b6"></i></div>'
-      +'<div style="margin:8px 0 4px"><b style="color:#f472b6">'+LI.name+'</b> · <span class="sub">'+LI.line+' · 픽션 1명 · 실인물 0</span></div>'
-      +'<p style="margin:12px 0;font-size:16px">'+currentLine()+'</p>'
-      +'<div id="msgCard" style="margin:0 0 12px;padding:10px 12px;border-radius:12px 12px 12px 4px;background:#241821;border:1px solid #f472b644">'
-      +'<div class="sub" style="margin:0 0 4px">💬 '+LI.name+' · 메시지 · 고정 1줄 · LLM 0</div>'
+    root.innerHTML='<div class="card">'
+      +'<div class="bar" style="height:6px;background:#2a2438;border-radius:4px;margin:0 0 12px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round((step+1)/SCENE_N*100)+'%;background:#f472b6"></i></div>'
+      +'<div style="margin:0 0 4px"><b style="color:#f472b6;font-size:1.15rem">'+LI.name+'</b> · <span class="sub">'+LI.line+'</span></div>'
+      +'<p style="margin:12px 0;font-size:16px;line-height:1.6">'+currentLine()+'</p>'
+      +'<div id="msgCard" style="margin:0 0 16px;padding:12px 14px;border-radius:12px 12px 12px 4px;background:#241821;border:1px solid #f472b644">'
+      +'<div class="sub" style="margin:0 0 4px">'+LI.name+'</div>'
       +'<p style="margin:0;font-size:15px">'+currentMsg()+'</p></div>'
       +(atEnd?endCardHtml(path):'')
-      +'<div class="row"><button id="a">다가간다 (-1)</button><button class="sec" id="b">기다린다 (-1)</button></div>'
+      +'<div class="row"><button id="a">다가간다</button><button class="sec" id="b">기다린다</button></div>'
       +'<div class="row" style="margin-top:8px"><button class="sec" id="undo" '+(step<=0?'disabled':'')+'>↩ 한 장면 되돌리기</button>'
-      +'<button class="sec" id="restart">처음부터</button><button class="sec" id="free">무료 +2 (일1)</button></div>'
+      +'<button class="sec" id="restart">처음부터</button></div>'
+      +'<p class="sub" style="margin-top:8px">남은 선택 '+credits+'</p>'
       +pathHtml
       +'<div id="log" class="sub" style="margin-top:10px"></div>'
-      +(atEnd?'<div id="sharePeak" style="margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px"><p style="margin:0 0 6px;font-size:13px">✨ 엔딩 직후 — 공유</p><button class="sec" id="shareBtn">📤 스토리 공유</button>'
-        +(loopN()===1?'<button class="sec" id="loop2" style="margin-top:8px;width:100%">루프2 · 비 오는 밤</button>':'<p class="sub" id="loop2End" role="button" tabindex="0" title="탭=처음부터 · 루프1 · CMS/LLM 0" style="margin:8px 0 0;cursor:pointer;text-decoration:underline">루프2 끝 · 장편 CMS 없음 · LLM 0 · 탭=처음부터</p>')
+      +(atEnd?'<div id="sharePeak" style="margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px"><p style="margin:0 0 6px;font-size:13px">지금 공유</p><button class="sec" id="shareBtn">스토리 공유</button>'
+        +(loopN()===1?'<button class="sec" id="loop2" style="margin-top:8px;width:100%">비 오는 밤, 한 번 더</button>':'<p class="sub" id="loop2End" role="button" tabindex="0" style="margin:8px 0 0;cursor:pointer">처음으로</p>')
         +'</div>':'')
       +'<p class="sub" style="margin-top:12px">엔터테인먼트 · 18+ · 실관계 아님</p></div>';
     function go(ch){
@@ -217,14 +216,9 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       step=0; setLoop(2); try{localStorage.setItem('rq_path','[]');}catch(e){}
       save(); render(); try{legionTrack('activate',{loop:2})}catch(e){}
     };
-    document.getElementById('free').onclick=function(){
-      var k='rq_free_'+dayKey(0);
-      if(localStorage.getItem(k)){document.getElementById('log').textContent='오늘 무료 충전 완료';return;}
-      credits+=2; localStorage.setItem(k,'1'); save(); render(); try{legionTrack('activate',{free:1})}catch(e){}
-    };
     var sb=document.getElementById('shareBtn');
     if(sb) sb.onclick=function(){
-      var text='Romance Quest '+LI.name+' · '+endL+' (fictional 18+) · path '+path.map(function(x){return x.ch;}).join('/')+'\n'+shareUrl();
+      var text=LI.name+' · '+endL+' · 픽션 18+\n'+shareUrl();
       if(navigator.share)navigator.share({text:text,url:shareUrl()}).catch(function(){});
       else if(navigator.clipboard)navigator.clipboard.writeText(text);
       try{legionTrack('share_peak',{end:endL})}catch(e){}
