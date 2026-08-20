@@ -1,15 +1,14 @@
 
-/* LEGION_WAVE_32_today_counter */
 try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw_p38_romance__today_counter')||'{}');if(_o.d!==_dk)_o={d:_dk,n:0};_o.n=(_o.n||0)+1;localStorage.setItem('lw_p38_romance__today_counter',JSON.stringify(_o));}catch(e){}
 (function(){
   var credits=+(localStorage.getItem('romance-quest_cr')||10);
   var root=document.getElementById('app');
   var step=+(localStorage.getItem('rq_step')||0);
-  /* GOLD50 TOP1: LADS/Ikemen — named LI. Fictional 1. 실인물 0 */
+  var FADE_MS=220;
+  var fading=false;
   var LI={name:'세하', line:'말수는 적고, 우산을 먼저 내민다.'};
   var SCENE_N=8;
   var SHARED='카페 앞에서 '+LI.name+'와 마주친다.';
-  /* GOLD50 TOP2: Romance Club — 다가감/대기 각 8줄=16. 엔진 없이 배열. 실인물 0 */
   var BRANCH={
     '다가감':[
       '먼저 손을 흔든다. '+LI.name+'가 짧게 고개만 끄덕인다.',
@@ -42,7 +41,6 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     var set=br[ch]||br['다가감'];
     return set[Math.min(step, set.length-1)]||sh;
   }
-  /* GOLD50 TOP3: Mystic/LADS 리추얼 — 장면마다 메시지 1줄. 고정카피. LLM 0 */
   var MSG=[
     '…여기야. 비 오는데.',
     '우산 있는데. 같이 가도 돼.',
@@ -53,7 +51,6 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
     '따뜻해. 잘 마셨어.',
     '내일도… 여기.'
   ];
-  /* GOLD50 TOP5: Love365 분량갭 — 루프2 비 오는 밤 8장면만. 장편 CMS 0. LLM 0 */
   var SHARED2='빗소리가 먼저 들린다. '+LI.name+'가 처마 밑에 서 있다.';
   var BRANCH2={
     '다가감':[
@@ -96,7 +93,6 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
   var SHARE_BASE='https://hosuman08-netizen.github.io/romance-quest/';
   function save(){localStorage.setItem('romance-quest_cr',credits);localStorage.setItem('rq_step',step);}
   function dayKey(off){var d=new Date();d.setDate(d.getDate()+(off||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-  function fomoLeft(){var e=new Date();e.setHours(24,0,0,0);var ms=Math.max(0,e-Date.now());return Math.floor(ms/3600000)+'h '+Math.floor((ms%3600000)/60000)+'m';}
   function kId(){try{var id=localStorage.getItem('rq_k_id');if(!id){id='r'+Math.random().toString(36).slice(2,8);localStorage.setItem('rq_k_id',id);}return id;}catch(e){return 'share';}}
   function shareUrl(){return SHARE_BASE+'?utm_source=share&utm_medium=app&ref='+encodeURIComponent(kId());}
   function pathLog(){try{return JSON.parse(localStorage.getItem('rq_path')||'[]');}catch(e){return[];}}
@@ -109,16 +105,15 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
   function endingLabel(path){
     var approach=path.filter(function(x){return x.ch==='다가감';}).length;
     var wait=path.filter(function(x){return x.ch==='대기';}).length;
-    if(approach>=wait+2) return '엔딩 A · 적극 루트';
-    if(wait>=approach+2) return '엔딩 B · 여운 루트';
-    return '엔딩 C · 균형 루트';
+    if(approach>=wait+2) return '적극 루트';
+    if(wait>=approach+2) return '여운 루트';
+    return '균형 루트';
   }
-  /* GOLD50 TOP4: LADS CG — 엔딩 A/B/C 색카드 + 경로 화살표. 엔진/LLM 0 */
   function endingMeta(path){
     var label=endingLabel(path);
-    if(label.indexOf('엔딩 A')===0) return {k:'A',t:'적극 루트',c:'#f472b6',bg:'#2a121c'};
-    if(label.indexOf('엔딩 B')===0) return {k:'B',t:'여운 루트',c:'#c4b5fd',bg:'#1a1428'};
-    return {k:'C',t:'균형 루트',c:'#67e8f9',bg:'#102428'};
+    if(label==='적극 루트') return {t:'적극 루트',s:'먼저 손을 내민 오늘',c:'#f472b6',bg:'#2a121c'};
+    if(label==='여운 루트') return {t:'여운 루트',s:'기다림이 남긴 오늘',c:'#c4b5fd',bg:'#1a1428'};
+    return {t:'균형 루트',s:'서로 맞춰 선 오늘',c:'#67e8f9',bg:'#102428'};
   }
   function pathArrowHtml(path){
     if(!path.length) return '';
@@ -131,10 +126,9 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
   }
   function endCardHtml(path){
     var m=endingMeta(path);
-    return '<div id="endCard" style="margin:10px 0 8px;padding:18px 14px;border:1px solid '+m.c+'66;border-radius:16px;background:linear-gradient(180deg,'+m.c+'22,'+m.bg+');text-align:center">'
-      +'<div style="font-size:52px;font-weight:800;line-height:1;color:'+m.c+'">'+m.k+'</div>'
-      +'<div style="margin:8px 0 0;font-weight:700;color:'+m.c+'">'+m.t+'</div>'
-      +'<div class="sub" style="margin:6px 0 0">픽션 · 실관계 아님</div>'
+    return '<div id="endCard" style="margin:8px 0 16px;padding:16px;border:1px solid '+m.c+'66;border-radius:16px;background:linear-gradient(180deg,'+m.c+'22,'+m.bg+');text-align:center">'
+      +'<div style="font-size:1.25rem;font-weight:800;line-height:1.3;color:'+m.c+'">'+m.t+'</div>'
+      +'<div class="sub" style="margin:8px 0 0">'+m.s+'</div>'
       +pathArrowHtml(path)+'</div>';
   }
   function bumpStreak(){
@@ -153,75 +147,94 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       return st;
     }catch(e){return {count:0};}
   }
-  function render(){
-    var st=JSON.parse(localStorage.getItem('rq_streak')||'{}');
-    var sc=st.count||0;
-    var ready=!st.shieldLast||((new Date(dayKey(0))-new Date(st.shieldLast))/86400000)>=7;
+  function paint(){
+    if(step>SCENE_N-1){step=SCENE_N-1; save();}
     var atEnd=step>=SCENE_N-1;
     var path=pathLog();
     var endL=atEnd?endingLabel(path):'';
-    var pathHtml=atEnd?'':pathArrowHtml(path);
-    if(step>SCENE_N-1){step=SCENE_N-1; save();}
-    root.innerHTML='<div class="card">'
-      +'<div class="bar" style="height:6px;background:#2a2438;border-radius:4px;margin:0 0 12px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round((step+1)/SCENE_N*100)+'%;background:#f472b6"></i></div>'
-      +'<div style="margin:0 0 4px"><b style="color:#f472b6;font-size:1.15rem">'+LI.name+'</b> · <span class="sub">'+LI.line+'</span></div>'
-      +'<p style="margin:12px 0;font-size:16px;line-height:1.6">'+currentLine()+'</p>'
-      +'<div id="msgCard" style="margin:0 0 16px;padding:12px 14px;border-radius:12px 12px 12px 4px;background:#241821;border:1px solid #f472b644">'
-      +'<div class="sub" style="margin:0 0 4px">'+LI.name+'</div>'
+    var canPlay=!atEnd && credits>0;
+    var showRestart=step>0 || credits<=0 || atEnd;
+    var html='<div class="card">'
+      +'<div style="margin:0 0 8px"><b style="color:#f472b6;font-size:1.15rem">'+LI.name+'</b> · <span class="sub">'+LI.line+'</span></div>'
+      +'<p style="margin:8px 0;font-size:16px;line-height:1.6">'+currentLine()+'</p>'
+      +'<div id="msgCard" style="margin:0 0 16px;padding:16px;border-radius:12px 12px 12px 4px;background:#241821;border:1px solid #f472b644">'
+      +'<div class="sub" style="margin:0 0 8px">'+LI.name+'</div>'
       +'<p style="margin:0;font-size:15px">'+currentMsg()+'</p></div>'
       +(atEnd?endCardHtml(path):'')
-      +'<div class="row"><button id="a">다가간다</button><button class="sec" id="b">기다린다</button></div>'
-      +'<div class="row" style="margin-top:8px"><button class="sec" id="undo" '+(step<=0?'disabled':'')+'>↩ 한 장면 되돌리기</button>'
-      +'<button class="sec" id="restart">처음부터</button></div>'
-      +'<p class="sub" style="margin-top:8px">남은 선택 '+credits+'</p>'
-      +pathHtml
-      +'<div id="log" class="sub" style="margin-top:10px"></div>'
-      +(atEnd?'<div id="sharePeak" style="margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px"><p style="margin:0 0 6px;font-size:13px">지금 공유</p><button class="sec" id="shareBtn">스토리 공유</button>'
-        +(loopN()===1?'<button class="sec" id="loop2" style="margin-top:8px;width:100%">비 오는 밤, 한 번 더</button>':'<p class="sub" id="loop2End" role="button" tabindex="0" style="margin:8px 0 0;cursor:pointer">처음으로</p>')
-        +'</div>':'')
-      +'<p class="sub" style="margin-top:12px">엔터테인먼트 · 18+ · 실관계 아님</p></div>';
+      +(canPlay?'<div class="row"><button type="button" id="a">다가간다</button><button type="button" class="sec" id="b">기다린다</button></div>':'')
+      +'<p class="sub" style="margin:8px 0 0">남은 선택 '+credits+'</p>'
+      +(step>0?'<div class="bar" aria-hidden="true"><i style="width:'+Math.round((step+1)/SCENE_N*100)+'%"></i></div>':'')
+      +'<div class="row" style="margin-top:8px">'
+      +(step>0 && credits>0?'<button type="button" class="sec" id="undo">한 장면 되돌리기</button>':'')
+      +(showRestart?'<button type="button" class="sec" id="restart">처음부터</button>':'')
+      +'</div>'
+      +'<div id="log" class="sub" style="margin-top:8px"></div>'
+      +(atEnd?'<div id="sharePeak" style="margin-top:16px;padding:16px;border:1px solid #f472b644;border-radius:16px"><p style="margin:0 0 8px;font-size:13px">지금 공유</p><div class="row"><button type="button" class="sec" id="shareBtn">이야기 공유</button>'
+        +(loopN()===1 && credits>0?'<button type="button" class="sec" id="loop2">비 오는 밤, 한 번 더</button>':'')
+        +'</div></div>':'')
+      +'</div>';
+    root.innerHTML=html;
     function go(ch){
-      if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 후원 문의';try{legionTrack('money_pipe_shown',{app:'romance',empty:1})}catch(e){}return;}
-      if(atEnd){document.getElementById('log').textContent='엔딩 완료 · 처음부터 또는 공유';return;}
+      if(fading) return;
+      if(credits<=0 || atEnd) return;
       credits--; step=Math.min(SCENE_N-1, step+1); pushPath(ch); save(); bumpStreak();
-      render();
-      document.getElementById('log').textContent='선택: '+ch;
-      if(step>=SCENE_N-1){try{legionTrack('share_peak_shown',{end:1})}catch(e){} try{legionTrack('money_pipe_shown',{app:'romance'})}catch(e){}}
+      render({fade:true});
       try{legionTrack('activate',{ch:ch,step:step})}catch(e){}
+      if(step>=SCENE_N-1){try{legionTrack('share_peak_shown',{end:1})}catch(e){} try{legionTrack('money_pipe_shown',{app:'romance'})}catch(e){}}
     }
-    document.getElementById('a').onclick=function(){go('다가감');};
-    document.getElementById('b').onclick=function(){go('대기');};
-    document.getElementById('undo').onclick=function(){
-      if(step<=0)return;
+    var a=document.getElementById('a');
+    var b=document.getElementById('b');
+    if(a) a.onclick=function(){go('다가감');};
+    if(b) b.onclick=function(){go('대기');};
+    var undo=document.getElementById('undo');
+    if(undo) undo.onclick=function(){
+      if(fading||step<=0)return;
       step=Math.max(0,step-1);
       try{var p=pathLog(); p.pop(); localStorage.setItem('rq_path',JSON.stringify(p));}catch(e){}
-      save(); render(); try{legionTrack('undo',{})}catch(e){}
+      save(); render({fade:true}); try{legionTrack('undo',{})}catch(e){}
     };
     function doRestartLoop1(){
       step=0; setLoop(1); try{localStorage.setItem('rq_path','[]');}catch(e){}
-      save(); render();
+      save(); render({fade:true});
     }
-    document.getElementById('restart').onclick=function(){
-      if(!confirm('처음부터? 크레딧은 유지'))return;
+    var restart=document.getElementById('restart');
+    if(restart) restart.onclick=function(){
+      if(fading) return;
+      if(!confirm('처음부터 다시 볼까요?'))return;
       doRestartLoop1(); try{legionTrack('restart',{})}catch(e){}
     };
-    var l2e=document.getElementById('loop2End');
-    if(l2e){
-      l2e.onclick=function(){ doRestartLoop1(); try{legionTrack('restart',{from:'loop2End'})}catch(e){}; };
-      l2e.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); l2e.click(); } };
-    }
     var l2=document.getElementById('loop2');
     if(l2) l2.onclick=function(){
+      if(fading) return;
       step=0; setLoop(2); try{localStorage.setItem('rq_path','[]');}catch(e){}
-      save(); render(); try{legionTrack('activate',{loop:2})}catch(e){}
+      save(); render({fade:true}); try{legionTrack('activate',{loop:2})}catch(e){}
     };
     var sb=document.getElementById('shareBtn');
     if(sb) sb.onclick=function(){
-      var text=LI.name+' · '+endL+' · 픽션 18+\n'+shareUrl();
-      if(navigator.share)navigator.share({text:text,url:shareUrl()}).catch(function(){});
-      else if(navigator.clipboard)navigator.clipboard.writeText(text);
+      var text=LI.name+'와 오늘 · '+endL+'\n픽션 · 18+';
+      if(navigator.share)navigator.share({title:LI.name+'와 오늘',text:text,url:shareUrl()}).catch(function(){});
+      else if(navigator.clipboard)navigator.clipboard.writeText(text+'\n'+shareUrl());
       try{legionTrack('share_peak',{end:endL})}catch(e){}
     };
+  }
+  function render(opts){
+    var doFade=opts&&opts.fade;
+    if(!doFade || !root.firstChild){
+      fading=false;
+      paint();
+      root.style.opacity='1';
+      return;
+    }
+    if(fading) return;
+    fading=true;
+    root.style.opacity='0';
+    setTimeout(function(){
+      paint();
+      requestAnimationFrame(function(){
+        root.style.opacity='1';
+        setTimeout(function(){ fading=false; }, FADE_MS);
+      });
+    }, FADE_MS);
   }
   try{var q=new URLSearchParams(location.search||'');var ref=q.get('ref');if(ref&&ref!=='share'&&ref!==kId()&&!localStorage.getItem('rq_k_from')){localStorage.setItem('rq_k_from',ref);try{legionTrack('k_link',{from:ref})}catch(e){}}}catch(e){}
   try{legionTrack('session_start',{})}catch(e){}

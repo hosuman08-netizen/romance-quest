@@ -1,6 +1,6 @@
 {
-  "name": "Romance Quest",
-  "short_name": "Romance Ques",
+  "name": "세하 · 오늘",
+  "short_name": "세하 · 오늘",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0b0a10",
