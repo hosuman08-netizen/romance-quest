@@ -185,7 +185,7 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       +'<div style="color:#e0b552;font-weight:700;margin-bottom:4px">💎 크레딧 · 후원 (18+ 엔터)</div>'
       +'<a style="color:#ece8f1;margin:0 6px" href="mailto:hoyashi95@gmail.com?subject=%5BRomance%5D%20support">☕ 후원</a>'
       +'<a style="color:#ece8f1;margin:0 6px" href="https://hosuman08-netizen.github.io/ai-companion/?utm_source=romance&utm_medium=pipe">💋 Companion</a>'
-      +'<a style="color:#e0b552;margin:0 6px" href="https://hosuman08-netizen.github.io/legion-hub/?utm_source=romance&utm_medium=pipe">🎮 Arcade</a></div></div>';
+      +'</div></div>';
     function go(ch){
       if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 후원 문의';try{legionTrack('money_pipe_shown',{app:'romance',empty:1})}catch(e){}return;}
       if(atEnd){document.getElementById('log').textContent='엔딩 완료 · 처음부터 또는 공유';return;}
