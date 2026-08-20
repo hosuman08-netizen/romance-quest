@@ -181,11 +181,7 @@ try{var _dk=new Date().toDateString();var _o=JSON.parse(localStorage.getItem('lw
       +(atEnd?'<div id="sharePeak" style="margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px"><p style="margin:0 0 6px;font-size:13px">✨ 엔딩 직후 — 공유</p><button class="sec" id="shareBtn">📤 스토리 공유</button>'
         +(loopN()===1?'<button class="sec" id="loop2" style="margin-top:8px;width:100%">루프2 · 비 오는 밤</button>':'<p class="sub" id="loop2End" role="button" tabindex="0" title="탭=처음부터 · 루프1 · CMS/LLM 0" style="margin:8px 0 0;cursor:pointer;text-decoration:underline">루프2 끝 · 장편 CMS 없음 · LLM 0 · 탭=처음부터</p>')
         +'</div>':'')
-      +'<div id="moneyPipe" style="margin-top:12px;padding:10px;border:1px solid #c5a46e44;border-radius:12px;background:#16121c;text-align:center;font-size:12px">'
-      +'<div style="color:#e0b552;font-weight:700;margin-bottom:4px">💎 크레딧 · 후원 (18+ 엔터)</div>'
-      +''
-      +'<a style="color:#ece8f1;margin:0 6px" href="https://hosuman08-netizen.github.io/ai-companion/?utm_source=romance&utm_medium=pipe">💋 Companion</a>'
-      +'</div></div>';
+      +'<p class="sub" style="margin-top:12px">엔터테인먼트 · 18+ · 실관계 아님</p></div>';
     function go(ch){
       if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 후원 문의';try{legionTrack('money_pipe_shown',{app:'romance',empty:1})}catch(e){}return;}
       if(atEnd){document.getElementById('log').textContent='엔딩 완료 · 처음부터 또는 공유';return;}
